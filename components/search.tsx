@@ -4,6 +4,7 @@ import React from "react";
 import GlassSurface from "./GlassSurface";
 import { Navigation2 } from "@deemlol/next-icons";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Medicine {
   name: string;
@@ -300,9 +301,14 @@ const search = () => {
       price: 2600,
     },
   ];
+    const router = useRouter();
+
+  const showMedicine = (index: number) => () => {
+    router.push(`/home/details/${index}`);
+  };
 
   return (
-    <div className="pt-8 flex flex-col items-center">
+    <div className="pt-8 flex flex-col items-center overflow-hidden">
       <GlassSurface borderRadius={400} className="!w-auto mb-12">
         <input
           type="text"
@@ -321,10 +327,26 @@ const search = () => {
         </button>
       </GlassSurface>
 
-<div className="text-md text-black/50">Listes des médicaments <span className="font-semibold">({medicines.length})</span> </div>
-      <div className="md:w-[1200px] h-[calc(100vh-100px)] overflow-y-scroll grid grid-cols-4 gap-6">
+      <div className="text-md text-black/50 md:w-[1200px] mb-4">
+        Listes des médicaments{" "}
+        <span className="font-semibold">({medicines.length})</span>{" "}
+      </div>
+      <div
+        className="md:w-[1200px] h-[calc(100vh-220px)] overflow-y-scroll grid grid-cols-4 gap-6 p-3"
+        style={{
+          width: "1200px",
+          height: "calc(100vh - 220px)",
+          overflowY: "scroll",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
         {medicines.map((item, index) => (
-          <div key={index} className="h-50 group cursor-pointer mb-6">
+          <div
+            onClick={showMedicine(index)}
+            key={index}
+            className="h-50 group cursor-pointer mb-6"
+          >
             <div className="h-30 w-full rounded-md bg-black/10 overflow-hidden group-hover:scale-105 duration-300">
               <Image
                 src="/images/hand.png"

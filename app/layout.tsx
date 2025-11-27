@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import DotGrid from "@/components/DotGrid";
 import LightRays from "@/components/LightRays";
+import { AuthProvider } from "@/lib/context/AuthContext";
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -22,24 +23,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
-        <div
-          style={{ width: "100%", position: "absolute" }}
-          className="-z-10 min-h-screen"
-        >
-          <LightRays
-            raysOrigin="top-center"
-            raysColor="#06d417ff"
-            raysSpeed={1.5}
-            lightSpread={0.8}
-            rayLength={1.2}
-            followMouse={true}
-            mouseInfluence={0.1}
-            noiseAmount={0.2}
-            distortion={0.1}
-            className="custom-rays"
-          />
-        </div>
-        {children}
+        <AuthProvider>
+          <div
+            style={{ width: "100%", position: "absolute" }}
+            className="-z-10 min-h-screen"
+          >
+            <LightRays
+              raysOrigin="top-center"
+              raysColor="#06d417ff"
+              raysSpeed={1.5}
+              lightSpread={0.8}
+              rayLength={1.2}
+              followMouse={true}
+              mouseInfluence={0.1}
+              noiseAmount={0.2}
+              distortion={0.1}
+              className="custom-rays"
+            />
+          </div>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

@@ -1,16 +1,16 @@
 import Footer from "@/components/Footer";
-import Hero from "@/components/hero";
 import Navbar from "@/components/Navbar";
+import SignInM from "@/components/SignInM";
 import React from "react";
 
-const page = () => {
+const signin = () => {
   return (
     <div className="relative">
       <Navbar />
-      <Hero />
+      <SignInM />
       <Footer />
     </div>
   );
 };
 
-export default page;
+export default signin;

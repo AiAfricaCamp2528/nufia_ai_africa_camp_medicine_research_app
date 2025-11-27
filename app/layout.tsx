@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
+import DotGrid from "@/components/DotGrid";
+import LightRays from "@/components/LightRays";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const poppins = Poppins({
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["devanagari"],
 });
 
 export const metadata: Metadata = {
@@ -24,9 +21,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${poppins.className} antialiased`}>
+        <div
+          style={{ width: "100%", position: "absolute" }}
+          className="-z-10 min-h-screen"
+        >
+          <LightRays
+            raysOrigin="top-center"
+            raysColor="#06d417ff"
+            raysSpeed={1.5}
+            lightSpread={0.8}
+            rayLength={1.2}
+            followMouse={true}
+            mouseInfluence={0.1}
+            noiseAmount={0.2}
+            distortion={0.1}
+            className="custom-rays"
+          />
+        </div>
         {children}
       </body>
     </html>

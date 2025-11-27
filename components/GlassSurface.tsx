@@ -194,16 +194,32 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   }, [width, height]);
 
   const supportsSVGFilters = () => {
-    const isWebkit = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
-    const isFirefox = /Firefox/.test(navigator.userAgent);
-
-    if (isWebkit || isFirefox) {
+    if (typeof window === 'undefined' || typeof document === 'undefined' || typeof navigator === 'undefined') {
       return false;
     }
 
-    const div = document.createElement('div');
-    div.style.backdropFilter = `url(#${filterId})`;
-    return div.style.backdropFilter !== '';
+    try {
+      const isWebkit = /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
+      const isFirefox = /Firefox/.test(navigator.userAgent);
+
+      if (isWebkit || isFirefox) {
+        return false;
+      }
+
+      const div = document.createElement('div');
+      // try-catch in case setting the style throws in some environments
+      try {
+        // Use a safe assignment and check
+        // @ts-ignore
+        div.style.backdropFilter = `url(#${filterId})`;
+      } catch (e) {
+        return false;
+      }
+
+      return (div.style as any).backdropFilter !== '';
+    } catch (e) {
+      return false;
+    }
   };
 
   const supportsBackdropFilter = () => {

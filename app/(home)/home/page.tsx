@@ -2,7 +2,7 @@ import React from 'react'
 import Search from '@/components/search'
 const page = () => {
   return (
-    <div>
+    <div className='overflow-hidden'>
       <Search />
     </div>
   )

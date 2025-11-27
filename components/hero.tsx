@@ -6,7 +6,7 @@ import { Navigation2 } from "@deemlol/next-icons";
 import Orb from "./Orb";
 import LightRays from "./LightRays";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Hero = () => {
 
@@ -16,11 +16,6 @@ const Hero = () => {
     { name: "Ca-C1000", searches: 98 },
   ];
 
-  const router = useRouter();
-
-  const handleMedicineSearchingNavigation = () => {
-    router.push('/home');
-  }
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -47,13 +42,13 @@ const Hero = () => {
             className="px-6 py-4 mr-2 rounded-full w-[700px] text-xl"
             placeholder="Quel médicament recherchez-vous ?"
           />
-          <button onClick={() => handleMedicineSearchingNavigation()} className="bg-green-600 text-white p-4 rounded-full cursor-pointer hover:bg-green-800 duration-400">
+          <Link href="/home" className="bg-green-600 text-white p-4 rounded-full cursor-pointer hover:bg-green-800 duration-400">
             <Navigation2
               size={24}
               color="#FFFFFF"
               style={{ transform: "rotate(90deg)" }}
             />
-          </button>
+          </Link>
         </GlassSurface>
         <div className="mt-16 w-[750px]">
           <div className="text-sm text-black/40 underline mb-3">
@@ -64,7 +59,7 @@ const Hero = () => {
               popularSearches.map((item, index) => (
                 <div key={index} className="h-50 group cursor-pointer">
                   <div className="h-30 w-full rounded-md bg-black/10 overflow-hidden group-hover:scale-105 duration-300">
-                  <Image src="" alt="image"/></div>
+                  <Image src="/images/hand.png" alt="image" width={20} height={20}/></div>
                   <div className="h-20 pt-2">
                     <div className="">{item.name}</div>
                     <div className="text-sm text-black/30">{item.searches} recherches</div>

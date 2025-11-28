@@ -1,34 +1,122 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import GlassSurface from "./GlassSurface";
 import { Navigation2 } from "@deemlol/next-icons";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from 'next/link';
-import { medicines } from "../lib/mocks/medicines";
-import { pharmacies } from "../lib/mocks/pharmacies";
-import { getPharmaciesWithMedicine } from "../lib/mocks/pharmacyInventory";
+import { getMedicines } from "@/lib/api/medicines";
+import { getPharmaciesWithMedicine } from "@/lib/api/pharmacies";
+
+interface MedicineHistory {
+  id: string | number;
+  name: string;
+  timestamp: number;
+}
 
 const Search = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [medicinesList, setMedicinesList] = useState<any[]>([]);
+  const [pharmaciesMap, setPharmaciesMap] = useState<Record<string, any[]>>({});
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Récupérer le paramètre 'search' de l'URL au montage
+  useEffect(() => {
+    const queryParam = searchParams.get("search");
+    if (queryParam) {
+      setSearchQuery(decodeURIComponent(queryParam));
+    }
+  }, [searchParams]);
+
+  // Load medicines from API on mount
+  useEffect(() => {
+    let mounted = true;
+    getMedicines()
+      .then((data) => {
+        if (!mounted) return;
+        // normalize DB rows to the shape expected by UI
+        const normalized = data.map((m: any) => ({
+          id: m.id,
+          name: m.name,
+          dosage: m.dosage ?? '',
+          form: m.form ?? '',
+          description: m.description ?? '',
+          indications: m.indications ?? [],
+          contraindications: m.contraindications ?? [],
+          sideEffects: m.side_effects ?? [],
+          manufacturer: m.manufacturer ?? '',
+          availability: m.availability ?? 'in_stock',
+          price: m.price ?? 0,
+        }));
+        setMedicinesList(normalized);
+
+        // preload pharmacies availability for each medicine (small lists only)
+        Promise.all(
+          normalized.map((med: any) =>
+            getPharmaciesWithMedicine(med.id).catch(() => [])
+          )
+        ).then((results) => {
+          if (!mounted) return;
+          const map: Record<string, any[]> = {};
+          normalized.forEach((med: any, i: number) => {
+            map[med.id] = results[i] || [];
+          });
+          setPharmaciesMap(map);
+        });
+      })
+      .catch((err) => console.error('Failed to load medicines', err));
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Enregistrer un médicament dans l'historique
+  const addToHistory = (medicineId: string, medicineName: string) => {
+    if (typeof window !== "undefined") {
+      const savedHistory = localStorage.getItem("medicineHistory");
+      let history: MedicineHistory[] = [];
+      if (savedHistory) {
+        try {
+          history = JSON.parse(savedHistory);
+        } catch (error) {
+          console.error("Erreur en chargeant l'historique:", error);
+        }
+      }
+
+      const newEntry: MedicineHistory = {
+        id: medicineId,
+        name: medicineName,
+        timestamp: Date.now(),
+      };
+
+      // Ajouter au début et éviter les doublons
+      const updated = [
+        newEntry,
+        ...history.filter((m) => m.id !== medicineId),
+      ].slice(0, 10);
+
+      localStorage.setItem("medicineHistory", JSON.stringify(updated));
+    }
+  };
 
   // Filtrer les médicaments en temps réel
   const filteredMedicines = useMemo(() => {
-    if (!searchQuery.trim()) return medicines;
-
+    const list = medicinesList;
+    if (!searchQuery.trim()) return list;
     const query = searchQuery.toLowerCase();
-    return medicines.filter((med) =>
+    return list.filter((med) =>
       med.name.toLowerCase().includes(query) ||
       med.dosage.toLowerCase().includes(query) ||
       med.form.toLowerCase().includes(query) ||
       med.manufacturer.toLowerCase().includes(query)
     );
-  }, [searchQuery]);
+  }, [searchQuery, medicinesList]);
 
-  const showMedicine = (index: number) => () => {
-    router.push(`/home/details/${index}`);
+  const showMedicine = (id: string, name: string) => () => {
+    addToHistory(id, name);
+    router.push(`/home/details/${id}`);
   };
 
   return (
@@ -67,10 +155,10 @@ const Search = () => {
         }}
       >
         {filteredMedicines.map((item, index) => {
-          const pharmaciesAvailable = getPharmaciesWithMedicine(index, pharmacies);
+          const pharmaciesAvailable = pharmaciesMap[item.id] ?? [];
           return (
             <div
-              onClick={showMedicine(index)}
+              onClick={showMedicine(item.id, item.name)}
               key={index}
               className="h-50 group cursor-pointer mb-6"
             >
@@ -120,7 +208,7 @@ const Search = () => {
                   </div>
                   <div className="space-y-1">
                     {pharmaciesAvailable.slice(0, 2).map((pharm) => (
-                      <Link key={pharm.id} href={`/pharmacies/${pharm.id}?key=${index}`}>
+                      <Link key={pharm.id} href={`/pharmacies/${pharm.id}?key=${item.id}`}>
                         <div onClick={(e) => e.stopPropagation()} className="text-black/60">
                           <span className="font-medium">{pharm.name}</span>
                           <span className="text-black/40"> - {pharm.medicinePrice} FCFA</span>

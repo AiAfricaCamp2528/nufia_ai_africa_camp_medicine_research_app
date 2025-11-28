@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { medicines } from '@/lib/mocks/medicines';
-import { pharmacies } from '@/lib/mocks/pharmacies';
-import { getMedicinesByPharmacy } from '@/lib/mocks/pharmacyInventory';
+import { getMedicines } from '@/lib/api/medicines';
+import { getPharmacies } from '@/lib/api/pharmacies';
 
 export default function DashboardPage() {
   const stats = useMemo(() => {

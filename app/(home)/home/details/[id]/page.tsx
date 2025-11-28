@@ -2,11 +2,9 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import PharmacyCard from "@/components/PharmacyCard";
-import { medicines } from "@/lib/mocks/medicines";
-import { pharmacies } from "@/lib/mocks/pharmacies";
-import { getPharmaciesWithMedicine } from "@/lib/mocks/pharmacyInventory";
+import { getMedicineByIdOrIndex, getPharmaciesWithMedicine } from "@/lib/db/queries";
 
-const availabilityLabel = (a: typeof medicines[number]["availability"]) =>
+const availabilityLabel = (a: 'in_stock' | 'low_stock' | 'out_of_stock' | null | undefined) =>
   a === "in_stock"
     ? { text: "✓ Disponible", color: "text-green-600", badge: "bg-green-50 border-l-4 border-green-500" }
     : a === "low_stock"
@@ -15,8 +13,7 @@ const availabilityLabel = (a: typeof medicines[number]["availability"]) =>
 
 const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
-  const medicineIndex = parseInt(id, 10); // Convertir string en nombre
-  const med = Number.isFinite(medicineIndex) && medicines[medicineIndex] ? medicines[medicineIndex] : null;
+  const med = await getMedicineByIdOrIndex(id);
 
   if (!med) {
     return (
@@ -33,9 +30,23 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
       </div>
     );
   }
+  // Normalize DB row to the shape used by the UI (legacy mock shape)
+  const medData = {
+    id: med.id,
+    name: med.name,
+    dosage: med.dosage ?? '',
+    form: med.form ?? '',
+    description: med.description ?? '',
+    indications: med.indications ?? [],
+    contraindications: med.contraindications ?? [],
+    sideEffects: (med as { side_effects?: string[] }).side_effects ?? [],
+    manufacturer: med.manufacturer ?? '',
+    availability: med.availability,
+    price: med.price ?? 0,
+  };
 
-  const availability = availabilityLabel(med.availability);
-  const pharmaciesWithMedicine = getPharmaciesWithMedicine(medicineIndex, pharmacies);
+  const availability = availabilityLabel(medData.availability);
+  const pharmaciesWithMedicine = await getPharmaciesWithMedicine(medData.id);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
@@ -51,30 +62,30 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
             {/* Product Image */}
             <div className="flex items-center justify-center">
               <div className="w-64 h-64 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg flex items-center justify-center overflow-hidden">
-                <Image src="/images/hand.png" alt={med.name} width={300} height={300} className="object-contain" />
+                <Image src="/images/hand.png" alt={medData.name} width={300} height={300} className="object-contain" />
               </div>
             </div>
 
             {/* Product Info */}
             <div className="md:col-span-2">
               <div className="mb-4">
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">{med.name}</h1>
+                <h1 className="text-4xl font-bold text-gray-900 mb-2">{medData.name}</h1>
                 <div className="text-lg text-gray-600">
-                  <span className="font-semibold">{med.dosage}</span> · <span>{med.form}</span>
+                  <span className="font-semibold">{medData.dosage}</span> · <span>{medData.form}</span>
                 </div>
-                <div className="text-sm text-gray-500 mt-1">Fabriquant: {med.manufacturer}</div>
+                <div className="text-sm text-gray-500 mt-1">Fabriquant: {medData.manufacturer}</div>
               </div>
 
               {/* Availability & Price */}
               <div className={`${availability.badge} p-4 rounded mb-6`}>
                 <div className={`font-bold text-lg ${availability.color} mb-2`}>{availability.text}</div>
-                <div className="text-3xl font-bold text-green-600">{med.price} FCFA</div>
+                <div className="text-3xl font-bold text-green-600">{medData.price} FCFA</div>
               </div>
 
               {/* Description */}
               <div className="mb-6">
                 <h2 className="font-bold text-gray-900 mb-2">Description</h2>
-                <p className="text-gray-700 leading-relaxed">{med.description}</p>
+                <p className="text-gray-700 leading-relaxed">{medData.description}</p>
               </div>
 
               {/* Action Buttons */}
@@ -96,7 +107,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 border-b-2 border-blue-500 pb-2">📋 Indications</h3>
             <ul className="space-y-2">
-              {med.indications.map((ind, idx) => (
+              {medData.indications.map((ind, idx) => (
                 <li key={idx} className="text-sm text-gray-700 flex items-start">
                   <span className="text-blue-600 mr-2">✓</span>
                   <span>{ind}</span>
@@ -109,7 +120,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 border-b-2 border-red-500 pb-2">⛔ Contre-indications</h3>
             <ul className="space-y-2">
-              {med.contraindications.map((contra, idx) => (
+              {medData.contraindications.map((contra, idx) => (
                 <li key={idx} className="text-sm text-gray-700 flex items-start">
                   <span className="text-red-600 mr-2">✗</span>
                   <span>{contra}</span>
@@ -122,7 +133,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h3 className="text-lg font-bold text-gray-900 mb-4 border-b-2 border-orange-500 pb-2">⚠️ Effets secondaires</h3>
             <ul className="space-y-2">
-              {med.sideEffects.map((effect, idx) => (
+              {medData.sideEffects.map((effect, idx) => (
                 <li key={idx} className="text-sm text-gray-700 flex items-start">
                   <span className="text-orange-600 mr-2">•</span>
                   <span>{effect}</span>
@@ -156,7 +167,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
                     openingHours: pharmacy.openingHours,
                     description: pharmacy.description,
                   }}
-                  href={`/pharmacies/${pharmacy.id}?key=${medicineIndex}`}
+                  href={`/pharmacies/${pharmacy.id}?key=${medData.id}`}
                   mode="price"
                   price={`${pharmacy.medicinePrice.toLocaleString()} FCFA`}
                   stock={pharmacy.medicineStock}

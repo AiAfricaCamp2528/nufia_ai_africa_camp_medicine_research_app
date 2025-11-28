@@ -25,8 +25,8 @@ export default function RootLayout({
       <body className={`${poppins.className} antialiased`}>
         <AuthProvider>
           <div
-            style={{ width: "100%", position: "absolute" }}
-            className="-z-10 min-h-screen"
+            style={{ width: "100%", height: "100vh", position: "fixed", top: 0, left: 0 }}
+            className="-z-10"
           >
             <LightRays
               raysOrigin="top-center"

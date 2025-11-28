@@ -1,28 +1,30 @@
 import { NextResponse } from 'next/server';
-import type { Database } from '../../../../lib/database.types';
 import { serverSupabase } from '../../../../lib/supabase';
-import { updateMedicineSchema } from '../../../../lib/validators/medicines';
+import type { Database } from '../../../../lib/database.types';
+import { z } from 'zod';
 
-type MedicineRow = Database['public']['Tables']['medicines']['Row'];
+type InventoryRow = Database['public']['Tables']['pharmacy_inventory']['Row'];
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+const updateInventorySchema = z.object({
+  stock: z.number().int().nonnegative().optional(),
+  price: z.number().nonnegative().optional(),
+  availability: z.enum(['in_stock', 'low_stock', 'out_of_stock']).optional(),
+  last_restocked: z.string().optional(),
+});
+
+export async function GET(_req: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = await params;
-    if (!id) {
-      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-    }
+    const { id } = params;
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
     const { data, error } = await serverSupabase
-      .from<MedicineRow>('medicines')
+      .from<InventoryRow>('pharmacy_inventory')
       .select('*')
       .eq('id', id)
       .maybeSingle();
 
     if (error) {
-      console.error('Supabase GET /medicines/[id] error', error);
+      console.error('GET /api/inventory/[id] error', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -32,33 +34,28 @@ export async function GET(
 
     return NextResponse.json(data, { status: 200 });
   } catch (err) {
-    console.error('Unexpected GET /medicines/[id] error', err);
+    console.error('Unexpected GET /api/inventory/[id] error', err);
     return NextResponse.json({ error: 'Unexpected error' }, { status: 500 });
   }
 }
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = await params;
-    if (!id) {
-      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-    }
+    const { id } = params;
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
     const body = await req.json();
-    const parsed = updateMedicineSchema.parse(body);
+    const parsed = updateInventorySchema.parse(body);
 
     const { data, error } = await serverSupabase
-      .from<MedicineRow>('medicines')
+      .from<InventoryRow>('pharmacy_inventory')
       .update(parsed)
       .eq('id', id)
       .select()
       .maybeSingle();
 
     if (error) {
-      console.error('Supabase PATCH /medicines/[id] error', error);
+      console.error('PATCH /api/inventory/[id] error', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -75,25 +72,20 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
   try {
-    const { id } = await params;
-    if (!id) {
-      return NextResponse.json({ error: 'Missing id' }, { status: 400 });
-    }
+    const { id } = params;
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
     const { data, error } = await serverSupabase
-      .from<MedicineRow>('medicines')
+      .from<InventoryRow>('pharmacy_inventory')
       .delete()
       .eq('id', id)
       .select()
       .maybeSingle();
 
     if (error) {
-      console.error('Supabase DELETE /medicines/[id] error', error);
+      console.error('DELETE /api/inventory/[id] error', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -103,7 +95,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {
-    console.error('Unexpected DELETE /medicines/[id] error', err);
+    console.error('Unexpected DELETE /api/inventory/[id] error', err);
     return NextResponse.json({ error: 'Unexpected error' }, { status: 500 });
   }
 }

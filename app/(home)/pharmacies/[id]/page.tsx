@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { pharmacies } from '@/lib/mocks/pharmacies';
-import { getMedicinesByPharmacy } from '@/lib/mocks/pharmacyInventory';
-import { medicines } from '@/lib/mocks/medicines';
+import { getMedicinesByPharmacy, getPharmacies } from '@/lib/db/queries';
 import { Key } from 'lucide-react';
 
 

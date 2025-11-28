@@ -1,9 +1,7 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { pharmacies } from '@/lib/mocks/pharmacies';
-import { getMedicinesByPharmacy } from '@/lib/mocks/pharmacyInventory';
-import { medicines } from '@/lib/mocks/medicines';
+import React, { useEffect, useState, useMemo } from 'react';
+import { getPharmacies } from '@/lib/api/pharmacies';
 import PharmacyCard from '@/components/PharmacyCard';
 
 export default function PharmaciesPage() {

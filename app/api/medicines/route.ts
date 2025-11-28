@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import type { Database } from '../../../../lib/database.types';
-import { serverSupabase } from '../../../../lib/supabase';
-import { createMedicineSchema } from '../../../../lib/validators/medicines';
+import type { Database } from '../../../lib/database.types';
+import { serverSupabase } from '../../../lib/supabase';
+import { createMedicineSchema } from '../../../lib/validators/medicines';
 
 type MedicineRow = Database['public']['Tables']['medicines']['Row'];
 

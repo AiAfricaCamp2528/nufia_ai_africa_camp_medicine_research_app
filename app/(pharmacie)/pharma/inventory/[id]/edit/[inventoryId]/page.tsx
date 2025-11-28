@@ -4,9 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { pharmacies } from '@/lib/mocks/pharmacies';
-import { pharmacyInventory } from '@/lib/mocks/pharmacyInventory';
-import { medicines } from '@/lib/mocks/medicines';
+import { getPharmacies } from '@/lib/db/queries';
 
 interface Params {
   id: string;

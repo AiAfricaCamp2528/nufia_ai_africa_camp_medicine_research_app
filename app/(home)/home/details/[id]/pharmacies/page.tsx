@@ -1,12 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import PharmacyCard from '@/components/PharmacyCard';
-import { medicines } from '@/lib/mocks/medicines';
-import { pharmacies } from '@/lib/mocks/pharmacies';
-import { getPharmaciesWithMedicine } from '@/lib/mocks/pharmacyInventory';
+import { getPharmaciesWithMedicine, getMedicineByIdOrIndex } from '@/lib/api/medicines';
 
 interface Params {
   id: string;

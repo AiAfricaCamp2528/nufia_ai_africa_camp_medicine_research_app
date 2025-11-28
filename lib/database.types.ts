@@ -79,6 +79,12 @@ export interface Database {
           longitude: number | null;
           image: string | null;
           description: string | null;
+          password: string | null;
+          manager_name: string | null;
+          manager_phone: string | null;
+          has_guard: boolean | null;
+          has_prescription: boolean | null;
+          district: string | null;
           created_at: string | null;
           updated_at: string | null;
         };
@@ -95,6 +101,12 @@ export interface Database {
           longitude?: number | null;
           image?: string | null;
           description?: string | null;
+          password?: string | null;
+          manager_name?: string | null;
+          manager_phone?: string | null;
+          has_guard?: boolean | null;
+          has_prescription?: boolean | null;
+          district?: string | null;
           created_at?: string | null;
           updated_at?: string | null;
         };

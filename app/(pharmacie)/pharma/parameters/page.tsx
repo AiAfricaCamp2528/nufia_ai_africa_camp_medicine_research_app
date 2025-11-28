@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -21,15 +21,15 @@ interface Pharmacy {
 }
 
 const PharmacistParameters = () => {
-  const [pharmacy, setPharmacy] = useState<Pharmacy | null>(null);
-  const [formData, setFormData] = useState<Pharmacy | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [pharmacy, setPharmacy] = React.useState<Pharmacy | null>(null);
+  const [formData, setFormData] = React.useState<Pharmacy | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [submitting, setSubmitting] = React.useState(false);
+  const [error, setError] = React.useState("");
+  const [success, setSuccess] = React.useState(false);
   const router = useRouter();
 
-  useEffect(() => {
+  React.useEffect(() => {
     const pharmacyAuth = localStorage.getItem('pharmacyAuth');
     if (!pharmacyAuth) {
       router.push("/pharma/signin");

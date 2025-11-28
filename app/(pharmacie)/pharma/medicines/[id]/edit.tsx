@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/lib/context/AuthContext";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { medicines } from "@/lib/mocks/medicines";
+import { getMedicine } from "@/lib/api/medicines";
 
 const EditMedicine = () => {
   const { isLoggedIn } = useAuth();

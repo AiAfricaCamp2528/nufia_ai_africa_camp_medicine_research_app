@@ -8,8 +8,12 @@ const PharmacieHome = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
         <div className="text-6xl mb-6">💊</div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Espace Pharmacien</h1>
-        <p className="text-gray-600 mb-8">Gérez votre inventaire et vos médicaments</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          Espace Pharmacien
+        </h1>
+        <p className="text-gray-600 mb-8">
+          Gérez votre inventaire et vos médicaments
+        </p>
 
         <div className="space-y-4">
           <Link
@@ -33,10 +37,16 @@ const PharmacieHome = () => {
         </div>
 
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-600 mb-3 font-semibold">Compte de démo disponible :</p>
+          <p className="text-sm text-gray-600 mb-3 font-semibold">
+            Compte de démo disponible :
+          </p>
           <div className="bg-gray-100 rounded p-3 text-left text-sm">
-            <p><strong>Email:</strong> pharma@test.com</p>
-            <p><strong>Mot de passe:</strong> password123</p>
+            <p>
+              <strong>Email:</strong> pharma@test.com
+            </p>
+            <p>
+              <strong>Mot de passe:</strong> password123
+            </p>
           </div>
         </div>
       </div>

@@ -61,6 +61,15 @@ const PharmacistDashboard = () => {
             </div>
           </Link>
 
+          {/* Inventory Card */}
+          <Link href="/pharma/select-pharmacy">
+            <div className="bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg shadow-lg p-6 text-white cursor-pointer hover:shadow-xl transition">
+              <div className="text-5xl mb-4">📦</div>
+              <h3 className="text-xl font-bold mb-2">Inventaire par pharmacie</h3>
+              <p>Gérer l&apos;inventaire de vos pharmacies</p>
+            </div>
+          </Link>
+
           {/* Settings Card */}
           <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg shadow-lg p-6 text-white">
             <div className="text-5xl mb-4">⚙️</div>

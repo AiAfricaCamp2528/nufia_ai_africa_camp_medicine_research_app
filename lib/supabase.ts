@@ -10,7 +10,6 @@ if (!SUPABASE_URL) {
 }
 
 if (!SUPABASE_ANON_KEY) {
-  // client key may be absent in some server-only contexts; but warn early
   console.warn('Missing env: NEXT_PUBLIC_SUPABASE_ANON_KEY');
 }
 
@@ -20,14 +19,18 @@ export const clientSupabase = createClient<Database>(
   { auth: { persistSession: true } }
 );
 
-if (!SUPABASE_SERVICE_ROLE) {
-  console.warn('Missing env: SUPABASE_SERVICE_ROLE_KEY (service role)');
+// serverSupabase uses the service role key and should only be used in server code
+if (typeof window !== 'undefined') {
+  console.warn('serverSupabase should never be imported in the browser.');
 }
 
-// serverSupabase uses the service role key and should only be used in server code
+if (!SUPABASE_SERVICE_ROLE) {
+  throw new Error('Missing env: SUPABASE_SERVICE_ROLE_KEY (service role)');
+}
+
 export const serverSupabase = createClient<Database>(
   SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE ?? '',
+  SUPABASE_SERVICE_ROLE,
   { auth: { persistSession: false } }
 );
 

@@ -7,7 +7,6 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from 'next/link';
 import { getMedicines } from "@/lib/api/medicines";
-import { getPharmaciesWithMedicine } from "@/lib/api/pharmacies";
 
 interface MedicineHistory {
   id: string | number;
@@ -52,19 +51,25 @@ const Search = () => {
         }));
         setMedicinesList(normalized);
 
-        // preload pharmacies availability for each medicine (small lists only)
-        Promise.all(
-          normalized.map((med: any) =>
-            getPharmaciesWithMedicine(med.id).catch(() => [])
-          )
-        ).then((results) => {
+        // Load pharmacies availability for each medicine using the API route
+        const loadPharmacies = async () => {
+          const results = await Promise.all(
+            normalized.map((med: any) =>
+              fetch(`/api/pharmacies/with-medicine/${med.id}`)
+                .then(res => res.ok ? res.json() : [])
+                .catch(() => [])
+            )
+          );
+          
           if (!mounted) return;
           const map: Record<string, any[]> = {};
           normalized.forEach((med: any, i: number) => {
             map[med.id] = results[i] || [];
           });
           setPharmaciesMap(map);
-        });
+        };
+        
+        loadPharmacies();
       })
       .catch((err) => console.error('Failed to load medicines', err));
     return () => {
